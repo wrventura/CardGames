@@ -16,8 +16,8 @@ public class PokerHand implements Comparable<PokerHand> {
 		Collections.sort(hand);
 	}
 	public int compareTo(PokerHand hand2){
-		ArrayList<Enum> handOne = this.rank();
-		ArrayList<Enum> handTwo = hand2.rank();
+		ArrayList<Enum> handOne = this.getRank();
+		ArrayList<Enum> handTwo = hand2.getRank();
 		for(int i=0;i<handOne.size();i++){
 			int temp = handOne.get(i).compareTo(handTwo.get(i)); 
 				if(temp != 0)
@@ -25,6 +25,7 @@ public class PokerHand implements Comparable<PokerHand> {
 		}
 		return 0;
 	}
+/*
 	public ArrayList<Enum> rank(){
 		ArrayList<Enum> rank = new ArrayList<Enum>();
 		Type type = getType();
@@ -59,6 +60,7 @@ public class PokerHand implements Comparable<PokerHand> {
 		}
 		return rank;
 	}
+*/
 	public ArrayList<Enum> pairRank(){
 		ArrayList<Enum> rank = new ArrayList<Enum>();
 		rank.add(Type.PAIR);
@@ -120,7 +122,7 @@ public class PokerHand implements Comparable<PokerHand> {
 			rank.add(hand.get(i).value);
 		return rank;
 	}
-	public ArrayList<Enum> twoPairRank(){
+	public ArrayList<Enum> twoPairsRank(){
 		ArrayList<Enum> rank = new ArrayList<Enum>();
 		Card firstCard = hand.get(0);
 		Card secondCard = hand.get(1);
@@ -244,17 +246,9 @@ public class PokerHand implements Comparable<PokerHand> {
 				temp = false;
 		return temp;
 	}
-	public Type getType(){
-		Type temp = null;
+	public ArrayList<Enum> getRank(){
 		boolean straight = this.isStraight();
 		boolean flush = this.isFlush();
-		if(straight && flush)
-			return Type.STRAIGHT_FLUSH;
-		else if(straight)
-			return Type.STRAIGHT;
-		else if(flush)
-			return Type.FLUSH;
-
 		Map<Value,Integer> duplicates = new HashMap<Value,Integer>();
 		int pairs = 0;
 		int threeOfKind = 0;
@@ -273,18 +267,23 @@ public class PokerHand implements Comparable<PokerHand> {
 			else if(duplicates.get(a) == 4)
 				fourOfKind++;
 		}		
-		if(fourOfKind == 1)
-			temp = Type.FOUR_OF_KIND;
+		if(straight && flush)
+			return straightFlushRank();
+		else if(straight)
+			return straightRank();
+		else if(flush)
+			return flushRank();
+		else if(fourOfKind == 1)
+			return fourOfKindRank();
 		else if(threeOfKind == 1 && pairs ==1)
-			temp = Type.FULL_HOUSE;
+			return fullHouseRank();
 		else if(pairs == 2)
-			temp = Type.TWO_PAIR;
+			return twoPairsRank();
 		else if(threeOfKind == 1)
-			temp = Type.THREE_OF_KIND;
+			return threeOfKindRank();
 		else if(pairs == 1)
-			temp = Type.PAIR;
+			return pairRank();
 		else
-			temp = Type.HIGH_CARD;
-		return temp;
+			return highCardRank();
 	}
 }

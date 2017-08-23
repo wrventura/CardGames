@@ -82,8 +82,9 @@ public class MainDriver {
 		while(in.hasNext()){
 			PokerHand hand1 = getHand(in);
 			PokerHand hand2 = getHand(in);
-			System.out.println("Hand #1 rank: " + Arrays.toString(hand1.rank().toArray()));
-			System.out.println("Hand #2 rank: " + Arrays.toString(hand2.rank().toArray()));
+			System.out.println("Hand #1: " + hand1.toString());
+			System.out.println("Hand #1 rank: " + Arrays.toString(hand1.getRank().toArray()));
+			System.out.println("Hand #2 rank: " + Arrays.toString(hand2.getRank().toArray()));
 			int result = hand1.compareTo(hand2);
 			if(result > 0)
 				System.out.println("Hand #1 wins!");
