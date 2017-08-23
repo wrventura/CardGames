@@ -87,11 +87,11 @@ public class MainDriver {
 			int result = hand1.compareTo(hand2);
 			if(result > 0)
 				System.out.println("Hand #1 wins!");
-		    else if(result < 0)
+		    	else if(result < 0)
 				System.out.println("Hand #2 wins!");
-		    else
+		    	else
 				System.out.println("It's a draw!");
-			System.out.println();
+				System.out.println();
 		}
 	}
 }
