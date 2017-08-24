@@ -1,11 +1,11 @@
 import java.util.*; 
 
 public class PokerHand implements Comparable<PokerHand> {
-	public enum Type {
+	private enum Type {
 		HIGH_CARD, PAIR, TWO_PAIR, THREE_OF_KIND, STRAIGHT,
 		FLUSH, FULL_HOUSE, FOUR_OF_KIND, STRAIGHT_FLUSH
 	}
-	public ArrayList<Card> hand;
+	private ArrayList<Card> hand;
 	public PokerHand(Card c1, Card c2, Card c3, Card c4, Card c5) {
 		hand = new ArrayList<Card>();
 		hand.add(c1);
@@ -25,43 +25,84 @@ public class PokerHand implements Comparable<PokerHand> {
 		}
 		return 0;
 	}
-/*
-	public ArrayList<Enum> rank(){
-		ArrayList<Enum> rank = new ArrayList<Enum>();
-		Type type = getType();
-		switch(type){
-		case STRAIGHT_FLUSH:
-			rank = straightFlushRank();
-			break;
-		case FOUR_OF_KIND:
-			rank = fourOfKindRank();
-			break;
-		case FULL_HOUSE:
-			rank = fullHouseRank();
-			break;
-		case FLUSH:
-			rank = flushRank();
-			break;
-		case STRAIGHT:
-			rank = straightRank();
-			break;
-		case THREE_OF_KIND:
-			rank = threeOfKindRank();
-			break;
-		case TWO_PAIR:
-			rank = twoPairRank();
-			break;
-		case PAIR:
-			rank = pairRank();
-			break;
-		case HIGH_CARD:
-			rank = highCardRank();
-			break;
+	public ArrayList<Enum> getRank(){
+		boolean straight = this.isStraight();
+		boolean flush = this.isFlush();
+		Map<Value,Integer> duplicates = new HashMap<Value,Integer>();
+		int pairs = 0;
+		int threeOfKind = 0;
+		int fourOfKind = 0;
+		for(int i=0;i<hand.size();i++){
+			if(!duplicates.containsKey(hand.get(i).value))
+				duplicates.put(hand.get(i).value,1);
+			else
+				duplicates.put(hand.get(i).value,
+					duplicates.get(hand.get(i).value)+1);
 		}
-		return rank;
+		for(Value a : duplicates.keySet()){
+			if(duplicates.get(a) == 2)
+				pairs++;
+			else if(duplicates.get(a) == 3)
+				threeOfKind++;
+			else if(duplicates.get(a) == 4)
+				fourOfKind++;
+		}		
+		if(straight && flush)
+			return straightFlushRank();
+		else if(straight)
+			return straightRank();
+		else if(flush)
+			return flushRank();
+		else if(fourOfKind == 1)
+			return fourOfKindRank();
+		else if(threeOfKind == 1 && pairs ==1)
+			return fullHouseRank();
+		else if(pairs == 2)
+			return twoPairsRank();
+		else if(threeOfKind == 1)
+			return threeOfKindRank();
+		else if(pairs == 1)
+			return pairRank();
+		else
+			return highCardRank();
 	}
-*/
-	public ArrayList<Enum> pairRank(){
+	public String toString(){
+		String temp = "[";
+		for(int i=0; i<hand.size();i++){
+			temp += hand.get(i).toString();
+			if(i< hand.size()-1)
+				temp += ", ";
+		}
+		temp += "]";
+		return temp;
+	}
+	private boolean isStraight(){
+		boolean temp = true;
+		Value a = hand.get(0).value;
+		if(a == Value.TWO && hand.get(4).value == Value.ACE){
+			for(int i=1; i<hand.size()-1;i++){
+				if(a.ordinal() != hand.get(i).value.ordinal() - 1)
+					temp = false;
+				a = hand.get(i).value;
+			}
+		}else{
+			for(int i=1;i<hand.size();i++){
+				if(a.ordinal() != hand.get(i).value.ordinal() - 1)
+					temp = false;
+				a = hand.get(i).value;
+			}
+		}
+		return temp;
+	}
+	private boolean isFlush(){
+		boolean temp = true;
+		Suit a = hand.get(0).suit;
+		for(int i=1;i<hand.size();i++)
+			if(a != hand.get(i).suit)
+				temp = false;
+		return temp;
+	}
+	private ArrayList<Enum> pairRank(){
 		ArrayList<Enum> rank = new ArrayList<Enum>();
 		rank.add(Type.PAIR);
 		Card first = hand.get(0);
@@ -95,7 +136,7 @@ public class PokerHand implements Comparable<PokerHand> {
 		}
 		return rank;
 	}
-	public ArrayList<Enum> straightFlushRank(){
+	private ArrayList<Enum> straightFlushRank(){
 		ArrayList<Enum> rank = new ArrayList<Enum>();
 		rank.add(Type.STRAIGHT_FLUSH);
 		if(hand.get(0).value == Value.TWO &&
@@ -105,7 +146,7 @@ public class PokerHand implements Comparable<PokerHand> {
 			rank.add(hand.get(4).value);
 		return rank;
 	}	
-	public ArrayList<Enum> straightRank(){
+	private ArrayList<Enum> straightRank(){
 		ArrayList<Enum> rank = new ArrayList<Enum>();
 		rank.add(Type.STRAIGHT);
 		if(hand.get(0).value == Value.TWO &&
@@ -115,14 +156,14 @@ public class PokerHand implements Comparable<PokerHand> {
 			rank.add(hand.get(4).value);
 		return rank;
 	}
-	public ArrayList<Enum> highCardRank(){
+	private ArrayList<Enum> highCardRank(){
 		ArrayList<Enum> rank = new ArrayList<Enum>();
 		rank.add(Type.HIGH_CARD);
 		for(int i=hand.size()-1;i>=0;i--)
 			rank.add(hand.get(i).value);
 		return rank;
 	}
-	public ArrayList<Enum> twoPairsRank(){
+	private ArrayList<Enum> twoPairsRank(){
 		ArrayList<Enum> rank = new ArrayList<Enum>();
 		Card firstCard = hand.get(0);
 		Card secondCard = hand.get(1);
@@ -147,14 +188,14 @@ public class PokerHand implements Comparable<PokerHand> {
 		}
 		return rank;
 	}
-	public ArrayList<Enum> flushRank(){
+	private ArrayList<Enum> flushRank(){
 		ArrayList<Enum> rank = new ArrayList<Enum>();
 		rank.add(Type.FLUSH);
 		for(int i=hand.size()-1;i >= 0;i--)
 			rank.add(hand.get(i).value);
 		return rank;
 	}	
-	public ArrayList<Enum> threeOfKindRank(){
+	private ArrayList<Enum> threeOfKindRank(){
 		Card firstCard = hand.get(0);
 		Card secondCard = hand.get(1);
 		Card fourthCard = hand.get(3);
@@ -178,7 +219,7 @@ public class PokerHand implements Comparable<PokerHand> {
 		}
 		return rank;
 	}	
-	public ArrayList<Enum> fullHouseRank(){
+	private ArrayList<Enum> fullHouseRank(){
 		Card secondCard = hand.get(1);
 		Card thirdCard = hand.get(2);
 		Card fourthCard = hand.get(3);
@@ -194,7 +235,7 @@ public class PokerHand implements Comparable<PokerHand> {
 		}
 		return rank;
 	}
-	public ArrayList<Enum> fourOfKindRank(){
+	private ArrayList<Enum> fourOfKindRank(){
 		Card firstCard = hand.get(0);
 		Card secondCard = hand.get(1);
 		Card lastCard = hand.get(4);
@@ -209,81 +250,5 @@ public class PokerHand implements Comparable<PokerHand> {
 			rank.add(firstCard.value);
 		}
 		return rank;
-	}
-	public String toString(){
-		String temp = "[";
-		for(int i=0; i<hand.size();i++){
-			temp += hand.get(i).toString();
-			if(i< hand.size()-1)
-				temp += ", ";
-		}
-		temp += "]";
-		return temp;
-	}
-	public boolean isStraight(){
-		boolean temp = true;
-		Value a = hand.get(0).value;
-		if(a == Value.TWO && hand.get(4).value == Value.ACE){
-			for(int i=1; i<hand.size()-1;i++){
-				if(a.ordinal() != hand.get(i).value.ordinal() - 1)
-					temp = false;
-				a = hand.get(i).value;
-			}
-		}else{
-			for(int i=1;i<hand.size();i++){
-				if(a.ordinal() != hand.get(i).value.ordinal() - 1)
-					temp = false;
-				a = hand.get(i).value;
-			}
-		}
-		return temp;
-	}
-	public boolean isFlush(){
-		boolean temp = true;
-		Suit a = hand.get(0).suit;
-		for(int i=1;i<hand.size();i++)
-			if(a != hand.get(i).suit)
-				temp = false;
-		return temp;
-	}
-	public ArrayList<Enum> getRank(){
-		boolean straight = this.isStraight();
-		boolean flush = this.isFlush();
-		Map<Value,Integer> duplicates = new HashMap<Value,Integer>();
-		int pairs = 0;
-		int threeOfKind = 0;
-		int fourOfKind = 0;
-		for(int i=0;i<hand.size();i++){
-			if(!duplicates.containsKey(hand.get(i).value))
-				duplicates.put(hand.get(i).value,1);
-			else
-				duplicates.put(hand.get(i).value,duplicates.get(hand.get(i).value)+1);
-		}
-		for(Value a : duplicates.keySet()){
-			if(duplicates.get(a) == 2)
-				pairs++;
-			else if(duplicates.get(a) == 3)
-				threeOfKind++;
-			else if(duplicates.get(a) == 4)
-				fourOfKind++;
-		}		
-		if(straight && flush)
-			return straightFlushRank();
-		else if(straight)
-			return straightRank();
-		else if(flush)
-			return flushRank();
-		else if(fourOfKind == 1)
-			return fourOfKindRank();
-		else if(threeOfKind == 1 && pairs ==1)
-			return fullHouseRank();
-		else if(pairs == 2)
-			return twoPairsRank();
-		else if(threeOfKind == 1)
-			return threeOfKindRank();
-		else if(pairs == 1)
-			return pairRank();
-		else
-			return highCardRank();
 	}
 }
