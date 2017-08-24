@@ -67,14 +67,7 @@ public class PokerHand implements Comparable<PokerHand> {
 			return highCardRank();
 	}
 	public String toString(){
-		String temp = "[";
-		for(int i=0; i<hand.size();i++){
-			temp += hand.get(i).toString();
-			if(i< hand.size()-1)
-				temp += ", ";
-		}
-		temp += "]";
-		return temp;
+		return hand.toString();
 	}
 	private boolean isStraight(){
 		boolean temp = true;

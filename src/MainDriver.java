@@ -6,11 +6,13 @@ import java.io.*;
 
 public class MainDriver {
 	public static void main(String[] args)throws Exception {
-		int games = 5;
+		int games = 60;
 		Deck deck = new Deck();
 		PokerHand player1 = null;
 		PokerHand player2 = null;
-		for(int i = 0; i < 5; i++){
+		for(int i = 0; i < games; i++){
+			if(deck.size() < 10)
+				deck = new Deck();
 			player1 = new PokerHand(deck.draw(),deck.draw(),deck.draw(),
 										deck.draw(),deck.draw());
 			player2 = new PokerHand(deck.draw(),deck.draw(),deck.draw(),
@@ -19,7 +21,7 @@ public class MainDriver {
 			System.out.println("Hand #1 rank: " + player1.getRank());
 			System.out.println("Hand #2: " + player2);
 			System.out.println("Hand #2 rank: " + player2.getRank());
-			int result =player1.compareTo(player2);
+			int result = player1.compareTo(player2);
 			if(result > 0)
 				System.out.println("Hand #1 wins!");
 		    	else if(result < 0)
